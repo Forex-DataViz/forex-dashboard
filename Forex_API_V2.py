@@ -18,7 +18,7 @@ def get_latest_date():
         response = requests.get(url).json()
 
         if "rates" in response:
-            return check_date
+            return response.get("date", check_date)
 
     return None
 
