@@ -14,7 +14,7 @@ def get_latest_date():
     # Tries today, falls back to previous days until data is found
     for i in range(5):
         check_date = (date.today() - timedelta(days=i)).strftime("%Y-%m-%d")
-        url = f"https://api.frankfurter.app/{check_date}?from=USD&to=PHP"
+        url = f"https://api.frankfurter.dev/v1/{check_date}?from=USD&to=PHP"
         response = requests.get(url).json()
 
         if "rates" in response:
@@ -31,8 +31,8 @@ latest = get_latest_date()
 if latest is None:
     raise Exception("No latest forex data available from Frankfurter API.")
 
-url_usd = f"https://api.frankfurter.app/2000-01-01..{latest}?from=USD&to=PHP"
-url_jpy = f"https://api.frankfurter.app/2000-01-01..{latest}?from=JPY&to=PHP"
+url_usd = f"https://api.frankfurter.dev/v1/2000-01-01..{latest}?from=USD&to=PHP"
+url_jpy = f"https://api.frankfurter.dev/v1/2000-01-01..{latest}?from=JPY&to=PHP"
 
 data_usd = requests.get(url_usd).json()
 data_jpy = requests.get(url_jpy).json()
