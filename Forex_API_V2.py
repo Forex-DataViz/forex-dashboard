@@ -11,37 +11,44 @@ start_time = time.perf_counter()
 
 
 def get_latest_date():
+    # Tries today, falls back to previous days until data is found
     for i in range(5):
         check_date = (date.today() - timedelta(days=i)).strftime("%Y-%m-%d")
-        url = f"https://api.frankfurter.dev/v2/rates?date={check_date}&quotes=PHP"
+        url = f"https://api.frankfurter.app/{check_date}?from=USD&to=PHP"
         response = requests.get(url).json()
-        if isinstance(response, list) and len(response) > 0:
-            return response[0]["date"]
+
+        if "rates" in response:
+            return check_date
+
     return None
 
 
 # ─────────────────────────────────────────
-# FOREX - Daily (Frankfurter v2 API)
+# FOREX - Daily (Frankfurter API)
 # ─────────────────────────────────────────
 latest = get_latest_date()
 
 if latest is None:
     raise Exception("No latest forex data available from Frankfurter API.")
 
-url_usd = f"https://api.frankfurter.dev/v2/rates?from=2000-01-01&quotes=PHP&base=USD"
-url_jpy = f"https://api.frankfurter.dev/v2/rates?from=2000-01-01&quotes=PHP&base=JPY"
+url_usd = f"https://api.frankfurter.app/2000-01-01..{latest}?from=USD&to=PHP"
+url_jpy = f"https://api.frankfurter.app/2000-01-01..{latest}?from=JPY&to=PHP"
 
 data_usd = requests.get(url_usd).json()
 data_jpy = requests.get(url_jpy).json()
 
-df_usd = pd.DataFrame([{"Date": r["date"], "USD_to_PHP": r["rate"]} for r in data_usd])
-df_usd = df_usd.set_index("Date")
+df_usd = pd.DataFrame.from_dict(data_usd["rates"], orient="index")
+df_usd.index = pd.to_datetime(df_usd.index)
+df_usd = df_usd.rename(columns={"PHP": "USD_to_PHP"})
 
-df_jpy = pd.DataFrame([{"Date": r["date"], "JPY_to_PHP": r["rate"]} for r in data_jpy])
-df_jpy = df_jpy.set_index("Date")
+df_jpy = pd.DataFrame.from_dict(data_jpy["rates"], orient="index")
+df_jpy.index = pd.to_datetime(df_jpy.index)
+df_jpy = df_jpy.rename(columns={"PHP": "JPY_to_PHP"})
 
 df_fx = pd.concat([df_usd, df_jpy], axis=1)
 df_fx.index = pd.to_datetime(df_fx.index)
+
+# Add Year column for joining World Bank annual data
 df_fx["Year"] = df_fx.index.year
 
 
@@ -87,11 +94,14 @@ df = df.drop(columns=["Year"])
 df = df.reset_index().rename(columns={"index": "Date"})
 df["Date"] = df["Date"].astype(str)
 
+# Fill NA values
 df = df.ffill()
 df = df.bfill()
 
+# Sort in chronological order: oldest to newest
 df_wide = df.sort_values("Date", ascending=True)
 
+# Create long format version for Tableau
 df_long = df_wide.melt(
     id_vars=["Date"],
     var_name="Variable",
@@ -107,6 +117,7 @@ scope = [
     "https://www.googleapis.com/auth/drive"
 ]
 
+# Supports both local credentials.json and GitHub Actions env secret
 creds_env = os.environ.get("GOOGLE_CREDENTIALS")
 
 if creds_env:
@@ -126,8 +137,19 @@ def get_or_create_worksheet(spreadsheet, title, rows, cols):
         return spreadsheet.add_worksheet(title=title, rows=rows, cols=cols)
 
 
-sheet_wide = get_or_create_worksheet(spreadsheet, title="FX_WIDE", rows="10000", cols="20")
-sheet_long = get_or_create_worksheet(spreadsheet, title="FX_LONG", rows="100000", cols="5")
+sheet_wide = get_or_create_worksheet(
+    spreadsheet,
+    title="FX_WIDE",
+    rows="10000",
+    cols="20"
+)
+
+sheet_long = get_or_create_worksheet(
+    spreadsheet,
+    title="FX_LONG",
+    rows="100000",
+    cols="5"
+)
 
 
 def load_or_append_wide(sheet, df_wide, latest):
@@ -140,6 +162,7 @@ def load_or_append_wide(sheet, df_wide, latest):
         print("Initial load complete for FX_WIDE.")
     else:
         existing_dates = [row[0] for row in existing[1:] if len(row) > 0]
+
         latest_row = df_wide[df_wide["Date"] == latest]
 
         if latest_row.empty:
@@ -161,6 +184,7 @@ def load_or_append_long(sheet, df_long, latest):
         print("Initial load complete for FX_LONG.")
     else:
         existing_dates = [row[0] for row in existing[1:] if len(row) > 0]
+
         latest_rows = df_long[df_long["Date"] == latest]
 
         if latest_rows.empty:
