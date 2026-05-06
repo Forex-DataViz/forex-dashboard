@@ -12,13 +12,7 @@ start_time = time.perf_counter()
 
 def get_latest_date():
     # Tries today, falls back to previous days until data is found
-    "2026-05-04"
-
-        if "rates" in response:
-            return check_date
-
-    return None
-
+    return "2026-05-04"
 
 # ─────────────────────────────────────────
 # FOREX - Daily (Frankfurter API)
