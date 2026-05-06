@@ -34,13 +34,13 @@ url_jpy = f"https://api.frankfurter.dev/v2/rates?from=2000-01-01&to={latest}&quo
 data_usd = requests.get(url_usd).json()
 data_jpy = requests.get(url_jpy).json()
 
-df_usd = pd.DataFrame.from_dict(data_usd["rates"], orient="index")
+df_usd = pd.DataFrame([{"Date": r["date"], "USD_to_PHP": r["rate"]} for r in data_usd])
+df_usd = df_usd.set_index("Date")
 df_usd.index = pd.to_datetime(df_usd.index)
-df_usd = df_usd.rename(columns={"PHP": "USD_to_PHP"})
 
-df_jpy = pd.DataFrame.from_dict(data_jpy["rates"], orient="index")
+df_jpy = pd.DataFrame([{"Date": r["date"], "JPY_to_PHP": r["rate"]} for r in data_jpy])
+df_jpy = df_jpy.set_index("Date")
 df_jpy.index = pd.to_datetime(df_jpy.index)
-df_jpy = df_jpy.rename(columns={"PHP": "JPY_to_PHP"})
 
 df_fx = pd.concat([df_usd, df_jpy], axis=1)
 df_fx.index = pd.to_datetime(df_fx.index)
