@@ -31,8 +31,8 @@ latest = get_latest_date()
 if latest is None:
     raise Exception("No latest forex data available from Frankfurter API.")
 
-url_usd = f"https://api.frankfurter.app/2000-01-01..{latest}?from=USD&to=PHP"
-url_jpy = f"https://api.frankfurter.app/2000-01-01..{latest}?from=JPY&to=PHP"
+url_usd = f"https://api.frankfurter.dev/v2/rates?from=2000-01-01&to={latest}&quotes=PHP&base=USD"
+url_jpy = f"https://api.frankfurter.dev/v2/rates?from=2000-01-01&to={latest}&quotes=PHP&base=JPY"
 
 data_usd = requests.get(url_usd).json()
 data_jpy = requests.get(url_jpy).json()
