@@ -12,7 +12,13 @@ start_time = time.perf_counter()
 
 def get_latest_date():
     # Tries today, falls back to previous days until data is found
-    return "2026-05-04"
+    for i in range(5):
+        check_date = (date.today() - timedelta(days=i)).strftime("%Y-%m-%d")
+        url = f"https://api.frankfurter.dev/v2/rates?date={check_date}&quotes=PHP"
+        response = requests.get(url).json()
+        if isinstance(response, list) and len(response) > 0:
+            return response[0]["date"]
+    return None
 
 # ─────────────────────────────────────────
 # FOREX - Daily (Frankfurter API)
