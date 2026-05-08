@@ -2,7 +2,7 @@ name: Daily Forex Pipeline
 
 on:
   schedule:
-    - cron: '0 1 * * 1-5'
+    - cron: '0 10 * * 1-5'  # 6PM Manila time (UTC+8)
   workflow_dispatch:
 
 jobs:
@@ -17,9 +17,9 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests pandas gspread oauth2client
+        run: pip install requests pandas gspread oauth2client yfinance
 
       - name: Run script
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: python Forex_API_V2.py
+        run: python Forex_API_V4.py
