@@ -1,4 +1,4 @@
-# PHP/USD & PHP/JPY Analysis (Forex_API_V2)
+# Forex_API_V2
 
 This project aims to analyze the Philippine Peso (PHP) against two major currencies, USD and JPY, throughout 
 the year 2000 up to present day to identify economic events that drove the depreciation of the PHP.
