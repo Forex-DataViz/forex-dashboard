@@ -17,7 +17,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests pandas gspread oauth2client lxml html5lib openpyxl numpy<2
+        run: pip install requests pandas gspread oauth2client lxml openpyxl 
 
       - name: Run script
         env:
