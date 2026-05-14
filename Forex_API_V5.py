@@ -321,19 +321,20 @@ def update_sheet(title, dataframe):
         )
 
     existing_data = sheet.get_all_values()
+    existing_headers = existing_data[0] if existing_data else []
     existing_dates = [row[0] for row in existing_data[1:] if row and row[0]]
 
-    print(f"[DEBUG] Sheet: {title}")
-    print(f"[DEBUG] Total rows in sheet (incl. header): {len(existing_data)}")
-    print(f"[DEBUG] Existing date rows count: {len(existing_dates)}")
-    print(f"[DEBUG] Latest date: {latest}")
-    print(f"[DEBUG] Dataframe shape: {dataframe.shape}")
-    print(f"[DEBUG] Dataframe columns: {dataframe.columns.tolist()}")
-    print(f"[DEBUG] Sample dates in dataframe: {dataframe['Date'].tail(3).tolist()}")
+    current_headers = dataframe.columns.tolist()
+    schema_changed = existing_headers != current_headers
 
-    if not existing_dates:
+    print(f"[DEBUG] Sheet: {title}")
+    print(f"[DEBUG] Schema changed: {schema_changed}")
+    print(f"[DEBUG] Existing headers: {existing_headers}")
+    print(f"[DEBUG] Current headers: {current_headers}")
+
+    if not existing_dates or schema_changed:
         sheet.clear()
-        sheet.append_row(dataframe.columns.tolist())
+        sheet.append_row(current_headers)
         sheet.append_rows(dataframe.values.tolist())
         print(f"[DEBUG] Full load done for {title}.")
 
