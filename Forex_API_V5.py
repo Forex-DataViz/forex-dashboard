@@ -323,23 +323,31 @@ def update_sheet(title, dataframe):
     existing_data = sheet.get_all_values()
     existing_dates = [row[0] for row in existing_data[1:] if row and row[0]]
 
-    if not existing_dates:  # ✅ no data rows at all → full load
+    print(f"[DEBUG] Sheet: {title}")
+    print(f"[DEBUG] Total rows in sheet (incl. header): {len(existing_data)}")
+    print(f"[DEBUG] Existing date rows count: {len(existing_dates)}")
+    print(f"[DEBUG] Latest date: {latest}")
+    print(f"[DEBUG] Dataframe shape: {dataframe.shape}")
+    print(f"[DEBUG] Dataframe columns: {dataframe.columns.tolist()}")
+    print(f"[DEBUG] Sample dates in dataframe: {dataframe['Date'].tail(3).tolist()}")
+
+    if not existing_dates:
         sheet.clear()
         sheet.append_row(dataframe.columns.tolist())
         sheet.append_rows(dataframe.values.tolist())
-        print(f"Initial load complete for {title}.")
+        print(f"[DEBUG] Full load done for {title}.")
 
-    elif latest not in existing_dates:  # has data but missing latest → append
+    elif latest not in existing_dates:
         new_rows = dataframe[dataframe["Date"] == latest]
+        print(f"[DEBUG] Rows matched for latest date: {len(new_rows)}")
         if not new_rows.empty:
             sheet.append_rows(new_rows.values.tolist())
             print(f"Appended {latest} to {title}.")
         else:
-            print(f"No row found for latest date: {latest}")
-
+            print(f"[DEBUG] No row found for latest date: {latest}")
     else:
-        print(f"{latest} already exists in {title}. Skipping.")
-
+        print(f"[DEBUG] {latest} already exists in {title}. Skipping.")
+        
 update_sheet("FX_WIDE", df_wide)
 
 # ─────────────────────────────────────────
