@@ -25,3 +25,10 @@ jobs:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python Forex_API_V5.py
+      - name: Commit CSV
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add FX_WIDE.csv
+          git commit -m "Update FX_WIDE.csv [$(date +%Y-%m-%d)]" || echo "No changes"
+          git push
