@@ -321,26 +321,24 @@ def update_sheet(title, dataframe):
         )
 
     existing_data = sheet.get_all_values()
+    existing_dates = [row[0] for row in existing_data[1:] if row and row[0]]
 
-    if len(existing_data) <= 1:
+    if not existing_dates:  # ✅ no data rows at all → full load
         sheet.clear()
         sheet.append_row(dataframe.columns.tolist())
         sheet.append_rows(dataframe.values.tolist())
         print(f"Initial load complete for {title}.")
 
-    else:
-        existing_dates = [row[0] for row in existing_data[1:] if row]
-
-        if latest not in existing_dates:
-            new_rows = dataframe[dataframe["Date"] == latest]
-
-            if not new_rows.empty:
-                sheet.append_rows(new_rows.values.tolist())
-                print(f"Appended {latest} to {title}.")
-            else:
-                print(f"No row found for latest date: {latest}")
+    elif latest not in existing_dates:  # has data but missing latest → append
+        new_rows = dataframe[dataframe["Date"] == latest]
+        if not new_rows.empty:
+            sheet.append_rows(new_rows.values.tolist())
+            print(f"Appended {latest} to {title}.")
         else:
-            print(f"{latest} already exists in {title}. Skipping.")
+            print(f"No row found for latest date: {latest}")
+
+    else:
+        print(f"{latest} already exists in {title}. Skipping.")
 
 update_sheet("FX_WIDE", df_wide)
 
