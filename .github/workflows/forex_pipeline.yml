@@ -1,24 +1,21 @@
 name: Daily Forex Pipeline
-
 on:
   schedule:
-    - cron: '0 10 * * 1-5'  # 6PM Manila time (UTC+8)
+    - cron: '0 10 * * 1-5'
   workflow_dispatch:
-
+permissions:
+  contents: write
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
       - name: Install dependencies
         run: pip install requests pandas gspread oauth2client lxml openpyxl
-
       - name: Run script
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
