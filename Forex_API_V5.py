@@ -207,49 +207,83 @@ ph_rate = get_bsp_policy_rate()
 # ─────────────────────────────────────────
 def get_bsp_monthly_gir():
     print("Fetching BSP Monthly GIR data...")
-
     url = "https://www.bsp.gov.ph/Statistics/sdds/table12_data.aspx"
-
     try:
         try:
             tables = pd.read_html(url, flavor="lxml")
         except Exception:
             tables = pd.read_html(url)
 
-        gir_df = None
+        # Table 0 is the one we need, 59 rows x 19 columns
+        raw = tables[0].copy()
 
-        for table in tables:
-            if table.shape[1] >= 2:
-                gir_df = table
-                break
+        # Based on debug output:
+        # Column 0 = Year
+        # Column 2 = Month
+        # Column 3 = GIR value
 
-        if gir_df is None:
-            print("GIR table not found.")
-            return pd.DataFrame()
+        year_col = raw[0]
+        month_col = raw[2]
+        gir_col = raw[3]
 
-        gir_df = gir_df.dropna(subset=[gir_df.columns[0]])
+        month_map = {
+            "Jan": "01", "January": "01",
+            "Feb": "02", "February": "02",
+            "Mar": "03", "March": "03",
+            "Apr": "04", "April": "04",
+            "May": "05",
+            "Jun": "06", "June": "06",
+            "Jul": "07", "July": "07",
+            "Aug": "08", "August": "08",
+            "Sep": "09", "September": "09",
+            "Oct": "10", "October": "10",
+            "Nov": "11", "November": "11",
+            "Dec": "12", "December": "12",
+        }
 
-        cols = list(gir_df.columns)
-        cols[0] = "Date"
-        cols[1] = "GIR_Million_USD"
-        gir_df.columns = cols
+        records = []
+        current_year = None
 
-        gir_df = gir_df[["Date", "GIR_Million_USD"]].copy()
+        for i in range(len(raw)):
+            year_val = str(year_col.iloc[i]).strip()
+            month_val = str(month_col.iloc[i]).strip()
+            gir_val = str(gir_col.iloc[i]).strip()
 
-        gir_df["GIR_Million_USD"] = pd.to_numeric(
-            gir_df["GIR_Million_USD"], errors="coerce"
-        )
+            # Update current year if this row has one
+            if year_val.isdigit() and len(year_val) == 4:
+                current_year = year_val
 
-        gir_df = gir_df.dropna(subset=["GIR_Million_USD"])
+            if current_year is None:
+                continue
 
-        gir_df["BSP_Gross_International_Reserves"] = (
-            gir_df["GIR_Million_USD"] / 1000
-        ).round(2)
+            # Convert GIR to numeric
+            gir_clean = gir_val.replace(",", "").replace("P", "").strip()
+            try:
+                gir_num = float(gir_clean)
+            except ValueError:
+                continue
 
-        gir_df["Date"] = pd.to_datetime(gir_df["Date"], errors="coerce")
-        gir_df = gir_df.dropna(subset=["Date"])
+            # Only keep valid GIR values
+            if gir_num < 1000:
+                continue
 
-        gir_df = gir_df[["Date", "BSP_Gross_International_Reserves"]]
+            # Determine month
+            month_clean = month_val.replace("P", "").strip()
+            month_num = month_map.get(month_clean, None)
+
+            if month_num:
+                date_str = f"{current_year}-{month_num}-01"
+            else:
+                # Annual row -- use December
+                date_str = f"{current_year}-12-01"
+
+            records.append({
+                "Date": pd.to_datetime(date_str),
+                "BSP_Gross_International_Reserves": round(gir_num / 1000, 4)
+            })
+
+        gir_df = pd.DataFrame(records)
+        gir_df = gir_df.drop_duplicates(subset=["Date"])
         gir_df = gir_df.set_index("Date").sort_index()
 
         return gir_df
