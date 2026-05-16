@@ -1,5 +1,4 @@
 # General Libraries
-import select
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -117,7 +116,7 @@ if section == "Overview":
     )
 
     st.subheader("Dataset Preview")
-    st.dataframe(df.head())
+    st.dataframe(df.tail())
 
     st.subheader("Summary Statistics")
     st.dataframe(df.describe())
