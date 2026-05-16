@@ -120,6 +120,6 @@ The pipeline aggregates data from five sources:
 | [EIA API](https://www.eia.gov/opendata/) | Brent Crude Oil spot price (RBRTE) | Monthly |
 | [FRED API](https://fred.stlouisfed.org/) | US Federal Funds Rate (FEDFUNDS) | Monthly |
 | BSP (`MonetaryPolicyDecisions.xlsx`) | Philippines BSP overnight policy rate | Per decision (forward-filled daily) |
-| [BSP Website](https://www.bsp.gov.ph/Statistics/sdds/table12_data.aspx) | Philippines Gross International Reserves | Monthly |
+| [BSP Website](https://www.bsp.gov.ph/Statistics/sdds/table12_data.aspx) | Philippines Gross International Reserves (in million USD) | Monthly |
 
 All monthly and annual series are forward-filled onto the daily forex spine. An additional forward-fill and back-fill pass is applied at the end to handle weekends and data publication lags.
