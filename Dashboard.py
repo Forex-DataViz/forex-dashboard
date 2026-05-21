@@ -19,7 +19,30 @@ st.set_page_config(
 )
 
 # =========================================================
-# PAGE CONFIG
+# CUSTOM SIDEBAR STYLE
+# =========================================================
+
+st.markdown("""
+<style>
+
+section[data-testid="stSidebar"] {
+    width: 350px !important;
+}
+
+section[data-testid="stSidebar"] .stRadio label {
+    font-size: 18px !important;
+    padding: 8px 0px;
+}
+
+section[data-testid="stSidebar"] .stRadio div {
+    gap: 10px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# LOAD DATA
 # =========================================================
 
 @st.cache_data
@@ -35,15 +58,51 @@ def load_data():
 df = load_data()
 
 # =========================================================
+# DIFFERENCE VARIABLES
+# =========================================================
+
+if "PH_Inflation" in df.columns and "US_Inflation" in df.columns:
+
+    df["Inflation_Differential"] = (df["PH_Inflation"] - df["US_Inflation"])
+
+if "PH_Policy_Rate" in df.columns and "US_Policy_Rate" in df.columns:
+
+    df["Interest_Differential"] = (df["PH_Policy_Rate"] - df["US_Policy_Rate"])
+
+# =========================================================
+# CORRELATION INTERPRETER
+# =========================================================
+
+def corr_strength(corr):
+
+    abs_corr = abs(corr)
+
+    if abs_corr >= 0.8:
+        return "Very Strong"
+
+    elif abs_corr >= 0.6:
+        return "Strong"
+
+    elif abs_corr >= 0.4:
+        return "Moderate"
+
+    elif abs_corr >= 0.2:
+        return "Weak"
+
+    else:
+        return "Very Weak"
+
+# =========================================================
 # TITLE
 # =========================================================
 
 st.title("PHP/USD Forex Analysis Dashboard")
 
 st.markdown("""
-### Objective
-Analyze PHP/USD exchange rate trends from 2000 to present and identify
-economic factors that significantly drive peso depreciation.
+### Hello!
+This is a dashboard that explores the PHP/USD exchange rates from 2000 to present.
+The dataset is collected daily through an active API feel free to visit
+https://github.com/Forex-DataViz/forex-dashboard for the full code.
 """)
 
 # =========================================================
@@ -116,10 +175,14 @@ if section == "Overview":
     )
 
     st.subheader("Dataset Preview")
-    st.dataframe(df.tail())
+    st.dataframe(df.tail(), use_container_width=True)
 
     st.subheader("Summary Statistics")
     st.dataframe(df.describe())
+
+    # =========================================================
+    # MAIN FOREX GRAPH
+    # =========================================================
 
     fig = px.line(
         df,
@@ -128,16 +191,49 @@ if section == "Overview":
         title="PHP/USD Exchange Rate (2000 - Present)"
     )
 
+    # 2008 Global Financial Crisis
+    fig.add_vrect(
+        x0="2008-09-01",
+        x1="2009-06-01",
+        fillcolor="red",
+        opacity=0.15,
+        line_width=0,
+        annotation_text="2008 Global Financial Crisis",
+        annotation_position="top left"
+    )
+
+    # COVID-19 Pandemic
+    fig.add_vrect(
+        x0="2020-03-01",
+        x1="2021-12-31",
+        fillcolor="orange",
+        opacity=0.15,
+        line_width=0,
+        annotation_text="COVID-19 Pandemic",
+        annotation_position="top left"
+    )
+
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("""
-        ### Interpretation
-
-        This graph shows the long-term movement of the Philippine Peso
+        This graph shows the movement of the Philippine Peso
         against the US Dollar.
 
-        An upward movement indicates peso depreciation because more pesos
-        are required to purchase one US dollar.
+        If the graph shows upward movement, that means peso 
+        is getting weaker, while downward movement 
+        signifies that the peso is getting stronger.
+        
+        The highlighted regions indicate major global economic disruptions
+        that significantly affected foreign exchange markets.
+        
+        - **2008 Global Financial Crisis**
+          triggered global financial instability,
+          capital outflows, and increased exchange rate volatility.
+        
+        - **COVID-19 Pandemic (2020–2021)**
+          caused major disruptions in trade, inflation,
+          monetary policy, and investor sentiment,
+          heavily influencing PHP/USD exchange rate behavior.
         """)
 
 # =========================================================
@@ -148,8 +244,16 @@ elif section == "Trend Analysis":
 
     st.header("Trend Analysis")
 
+    # =========================================================
+    # ROLLING AVERAGES
+    # =========================================================
+
     df["MA_30"] = df["USD_to_PHP"].rolling(30).mean()
     df["MA_90"] = df["USD_to_PHP"].rolling(90).mean()
+
+    # =====================================================
+    # ROLLING AVERAGE GRAPH
+    # =====================================================
 
     fig = go.Figure()
 
@@ -177,37 +281,17 @@ elif section == "Trend Analysis":
         )
     )
 
-    # Financial Crisis
-    fig.add_vline(
-        x = pd.to_datetime("2000-09-01"),
-        line_dash = "dash"
-    )
-
-    # COVID
-    fig.add_vline(
-        x = pd.to_datetime("2020-03-01"),
-        line_dash = "dash"
-    )
-
     fig.update_layout(
-        title = "Exchange Rate Trend with Moving Averages",
+        title = "Rolling Average Trend Analysis",
         xaxis_title="Date",
         yaxis_title="PHP/USD"
     )
 
     st.plotly_chart(fig, use_container_width=True)
 
-    st.subheader("Exchange Rate Volatility")
-
     st.markdown("""
-        ### Interpretation
-
-        Moving averages smooth short-term fluctuations and help identify
-        broader exchange rate trends.
-
-        The vertical markers highlight:
-        - 2008 Global Financial Crisis
-        - COVID-19 Pandemic
+        Moving averages smooth short-term fluctuations 
+        and help identify broader exchange rate trends.
         """)
 
     # =====================================================
@@ -228,16 +312,8 @@ elif section == "Trend Analysis":
     st.plotly_chart(vol_fig, use_container_width=True)
 
     st.markdown("""
-        ### Interpretation
-
-        Volatility measures the degree of exchange rate fluctuations.
-
-        Higher volatility may indicate:
-        - financial uncertainty
-        - speculative pressure
-        - inflation shocks
-        - aggressive monetary tightening
-        - global crises
+        Volatility measures the magnitude and frequency 
+        of exchange rate fluctuations over time.
         """)
 
     # =====================================================
@@ -263,32 +339,13 @@ elif section == "Trend Analysis":
 
     st.plotly_chart(yearly_fig, use_container_width=True)
 
-    st.markdown("""
-        ### Interpretation
-
-        This graph summarizes yearly average exchange rates.
-
-        A rising trend suggests long-term peso depreciation,
-        while declines suggest appreciation periods.
-        """)
-
 # =========================================================
 # ECONOMIC DRIVERS
 # =========================================================
 
 elif section == "Economic Drivers":
 
-    st.header("Economic Drivers of Peso Depreciation")
-
-    if "PH_Inflation" in df.columns and "US_inflation" in df.columns:
-        df["Inflation_Diff"] = (
-            df["PH_inflation"] - df["US_Inflation"]
-        )
-
-    if "PH_Policy_Rate" in df.columns and "US_Policy_Rate" in df.columns:
-        df["Rate_Diff"] = (
-            df["PH_Policy_Rate"] - df["US_Policy_Rate"]
-        )
+    st.header("Economic Drivers of Philippine Peso")
 
     numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
 
@@ -298,6 +355,10 @@ elif section == "Economic Drivers":
         "Select Economic Variable",
         selectable
     )
+
+    # =========================================================
+    # SCATTER PLOT
+    # =========================================================
 
     scatter_fig = px.scatter(
         df,
@@ -309,30 +370,43 @@ elif section == "Economic Drivers":
 
     st.plotly_chart(scatter_fig, use_container_width=True)
 
-    correlation = df[[selected, "USD_to_PHP"]].corr().iloc[0, 1]
+    # =====================================================
+    # CORRELATION
+    # =====================================================
 
-    st.metric(
-        "Correlation with USD/PHP",
-        round(correlation, 4)
+    temp_df = df[[selected, "USD_to_PHP"]].dropna()
+
+    correlation = temp_df.corr().iloc[0, 1]
+
+    strength = corr_strength(correlation)
+
+    col1, col2 = st.columns(2)
+
+    col1.metric(
+        "Correlation",
+        round(correlation, 2),
+    )
+
+    col2.metric(
+        "Strength",
+        strength,
     )
 
     st.markdown("""
-        ### Interpretation
-        
-        This graph examines the relationship between the selected
-        economic variable and the PHP/USD exchange rate.
+            This graph examines the relationship between the selected
+            economic variable and the PHP/USD exchange rate.
 
-        - Positive correlation:
-          As the variable increases, PHP/USD tends to increase
-          (peso depreciates).
+            - Positive correlation:
+              As the variable increases, PHP/USD tends to increase
+              (peso depreciates).
 
-        - Negative correlation:
-          As the variable increases, PHP/USD tends to decrease
-          (peso appreciates).
-          
-        Correlation does not necessarily imply causation,
-        but it helps identify potentially influential macroeconomic factors.
-        """)
+            - Negative correlation:
+              As the variable increases, PHP/USD tends to decrease
+              (peso appreciates).
+
+            Correlation does not necessarily imply causation,
+            but it helps identify potentially influential macroeconomic factors.
+            """)
 
 # =========================================================
 # CORRELATION ANALYSIS
@@ -342,7 +416,18 @@ elif section == "Correlation Analysis":
 
     st.header("Correlation Analysis")
 
-    corr = df.select_dtypes(include=np.number).corr()
+    corr_df = df.select_dtypes(include=np.number)
+
+    corr_df = corr_df.loc[
+        :,
+        ~corr_df.columns.str.contains(
+            "Lag_|Rolling",
+            case=False,
+            regex=True
+        )
+    ]
+
+    corr = corr_df.corr()
 
     heatmap = px.imshow(
         corr,
@@ -363,7 +448,9 @@ elif section == "Correlation Analysis":
 
     target_corr.columns = ["Variable", "Correlation"]
 
-    st.dataframe(target_corr)
+    target_corr["Strength"] = (target_corr["Correlation"].apply(corr_strength))
+
+    st.dataframe(target_corr, use_container_width=True)
 
 # =====================================================
 # PREDICTIVE MODELING
@@ -384,9 +471,11 @@ elif section == "Predictive Modeling":
     using historical exchange rate patterns.
     """)
 
-    #Data prep
+    # =====================================================
+    # DATA PREP
+    # =====================================================
+
     model_df = df.copy()
-    model_df = model_df.sort_values("Date")
 
     # Monthly sampling
     model_df = (
@@ -395,12 +484,6 @@ elif section == "Predictive Modeling":
         .resample("ME")
         .mean(numeric_only=True)
         .reset_index()
-    )
-
-    model_df = (
-        model_df
-        .sort_values("Date")
-        .reset_index(drop=True)
     )
 
     # Lag
@@ -415,7 +498,6 @@ elif section == "Predictive Modeling":
     model_df["Lag_3"] = (
         model_df["USD_to_PHP"].shift(3)
     )
-
 
     # Rolling values
     model_df["Rolling_Mean_3"] = (
@@ -465,7 +547,30 @@ elif section == "Predictive Modeling":
 
     model.fit(X_train, y_train)
 
+    # =====================================================
+    # PREDICTIONS
+    # =====================================================
+
+    train_predictions = model.predict(X_train)
+
     predictions = model.predict(X_test)
+
+    # =====================================================
+    # TRAINING METRICS
+    # =====================================================
+
+    train_rmse = np.sqrt(
+        mean_squared_error(y_train, train_predictions)
+    )
+
+    train_r2 = r2_score(
+        y_train,
+        train_predictions
+    )
+
+    # =====================================================
+    # TESTING METRICS
+    # =====================================================
 
     rmse = np.sqrt(
         mean_squared_error(y_test, predictions)
@@ -473,25 +578,36 @@ elif section == "Predictive Modeling":
 
     r2 = r2_score(y_test, predictions)
 
-    col1, col2 = st.columns(2)
+    # =====================================================
+    # METRIC DISPLAY
+    # =====================================================
+
+    col1, col2, col3, col4 = st.columns(4)
 
     col1.metric(
-        "RMSE",
-        round(rmse, 4)
+        "Train RMSE",
+        round(train_rmse, 4)
     )
 
     col2.metric(
-        "R² Score",
+        "Test RMSE",
+        round(rmse, 4)
+    )
+
+    col3.metric(
+        "Train R²",
+        round(train_r2, 4)
+    )
+
+    col4.metric(
+        "Test R²",
         round(r2, 4)
     )
 
     st.markdown("""
-    ### Interpretation
-
     - RMSE measures average prediction error.
-      Lower values indicate better model performance.
-      Closer to 0 is better as it says the model is able to
-      correctly predict the outcome.
+      Lower RMSE values indicate smaller prediction errors 
+      and better model performance.
 
     - R² measures how much variation in exchange rates
       is explained by the model. Values closer to 1 indicate
@@ -540,12 +656,11 @@ elif section == "Predictive Modeling":
         display_importance.sort_values(
             "Importance",
             ascending=False
-        )
+        ),
+        use_container_width=True
     )
 
     st.markdown("""
-    ### Interpretation
-
     Feature importance estimates which macroeconomic variables
     contribute most to exchange rate movement predictions.
 
@@ -556,9 +671,6 @@ elif section == "Predictive Modeling":
     # =====================================================
     # RESIDUAL ANALYSIS
     # =====================================================
-
-    # Training predictions
-    train_predictions = model.predict(X_train)
 
     # Residuals
     train_residuals = y_train - train_predictions
@@ -577,7 +689,8 @@ elif section == "Predictive Modeling":
         train_residual_df,
         x="Date",
         y="Residuals",
-        title="Training Set Residuals"
+        title="Training Set Residuals",
+        opacity=0.7
     )
 
     train_fig.add_hline(
@@ -665,8 +778,24 @@ elif section == "Predictive Modeling":
     # Second forecast input
     latest2 = latest.copy()
 
-    if "Lag_1" in latest2.columns:
-        latest2["Lag_1"] = month1_prediction
+    # Store previous lag values
+    old_lag1 = latest["Lag_1"].values[0]
+    old_lag2 = latest["Lag_2"].values[0]
+
+    # Update lag structure
+    latest2["Lag_1"] = month1_prediction
+    latest2["Lag_2"] = old_lag1
+    latest2["Lag_3"] = old_lag2
+
+    rolling_values = [
+        month1_prediction,
+        old_lag1,
+        old_lag2
+    ]
+
+    latest2["Rolling_Mean_3"] = np.mean(rolling_values)
+
+    latest2["Rolling_STD_3"] = np.std(rolling_values, ddof=1)
 
     # Second forecast
     month2_prediction = model.predict(latest2)[0]
@@ -685,15 +814,15 @@ elif section == "Predictive Modeling":
     last_actual = model_df["USD_to_PHP"].iloc[-1]
 
     month1_label = (
-        "Increase"
+        "Peso Weakening"
         if month1_prediction > last_actual
-        else "Decrease"
+        else "Peso Strengthening"
     )
 
     month2_label = (
-        "Increase"
+        "Peso Weakening"
         if month2_prediction > month1_prediction
-        else "Decrease"
+        else "Peso Strengthening"
     )
 
     forecast_df = pd.DataFrame({
@@ -730,30 +859,19 @@ elif section == "Credits":
 
     st.markdown("""
        ## Project Developers
-       
-       Bryant Kenzo Carolino
-       
-       Ulrik Garbriyel Favorada
-       
-       Sean Eldridge Lavado
-       
-       Sam Dominique Punzalan
-       
-       Thom Daniel Yutuc
+       - Bryant Kenzo Carolino
+       - Ulrik Garbriyel Favorada
+       - Sean Eldridge Lavado
+       - Sam Dominique Punzalan
+       - Thom Daniel Yutuc
 
        ## Data Sources
-
-       Frankfurter API - Daily PHP/USD
-       
-       Worldbank API - GDP, FDI, Inflation
-       
-       U.S. Energy Information Administration (EIA) - Monthly Brent Crude Oil
-       
-       Federal Reserve Economic Data (FRED) - US monthly policy
-       
-       Bangko Sentral ng Pilipinas (scraped) - GIR
-       
-       Excel File (Bangko Sentral ng Pilipinas PH monetary policy)
+       - Frankfurter API - Daily PHP/USD
+       - Worldbank API - GDP, FDI, Inflation
+       - U.S. Energy Information Administration (EIA) - Monthly Brent Crude Oil
+       - Federal Reserve Economic Data (FRED) - US monthly policy
+       - Bangko Sentral ng Pilipinas (scraped) - GIR
+       - Excel File (Bangko Sentral ng Pilipinas PH monetary policy)
        """)
 
 # =========================================================
@@ -762,11 +880,15 @@ elif section == "Credits":
 
 st.markdown("---")
 
-st.markdown("""
-Dashboard Developed Using:
-- Streamlit
-- Plotly
-- Pandas
-- NumPy
-- Scikit-learn
+st.warning("""
+Disclaimer:
+
+This dashboard is intended solely for educational purposes.
+
+The analyses, forecasts, and visualizations presented are based on
+historical data and machine learning estimates and should not be interpreted
+as financial or investment advice.
+
+Foreign exchange markets are highly volatile and influenced by numerous
+unpredictable economic and geopolitical factors.
 """)
