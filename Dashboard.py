@@ -50,6 +50,7 @@ def load_data():
     df = pd.read_csv("FX_WIDE.csv")
 
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    df = df.dropna(subset=["Date"])
 
     df = df.sort_values("Date")
 
@@ -681,7 +682,7 @@ elif section == "Predictive Modeling":
     # =====================================================
 
     train_residual_df = pd.DataFrame({
-        "Date": model_df["Date"].iloc[:split_index].values,
+        "Date": pd.to_datetime(model_df["Date"].iloc[:split_index]),
         "Residuals": train_residuals
     })
 
@@ -728,7 +729,7 @@ elif section == "Predictive Modeling":
     # =====================================================
 
     test_residual_df = pd.DataFrame({
-        "Date": model_df["Date"].iloc[split_index:].values,
+        "Date": pd.to_datetime(model_df["Date"].iloc[split_index:]),
         "Residuals": test_residuals
     })
 
