@@ -1,4 +1,4 @@
-## Website
+## Dashboard Link
 Working web dashboard [Click Here](https://forex-dashboard-carolino-favorada-lavado-punzalan-yutuc.streamlit.app)
 
 ---
