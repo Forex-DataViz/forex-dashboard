@@ -49,7 +49,7 @@ section[data-testid="stSidebar"] .stRadio div {
 def load_data():
     df = pd.read_csv("FX_WIDE.csv")
 
-    df["Date"] = pd.to_datetime(df["Date"])
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
 
     df = df.sort_values("Date")
 
@@ -175,7 +175,7 @@ if section == "Overview":
     )
 
     st.subheader("Dataset Preview")
-    st.dataframe(df.tail(), use_container_width=True)
+    st.dataframe(df.tail(), width="stretch")
 
     st.subheader("Summary Statistics")
     st.dataframe(df.describe())
@@ -213,7 +213,7 @@ if section == "Overview":
         annotation_position="top left"
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.markdown("""
         This graph shows the movement of the Philippine Peso
@@ -287,7 +287,7 @@ elif section == "Trend Analysis":
         yaxis_title="PHP/USD"
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.markdown("""
         Moving averages smooth short-term fluctuations 
@@ -309,7 +309,7 @@ elif section == "Trend Analysis":
         title="30-Day Rolling Volatility"
     )
 
-    st.plotly_chart(vol_fig, use_container_width=True)
+    st.plotly_chart(vol_fig, width="stretch")
 
     st.markdown("""
         Volatility measures the magnitude and frequency 
@@ -337,7 +337,7 @@ elif section == "Trend Analysis":
         title="Average Yearly PHP/USD"
     )
 
-    st.plotly_chart(yearly_fig, use_container_width=True)
+    st.plotly_chart(yearly_fig, width="stretch")
 
 # =========================================================
 # ECONOMIC DRIVERS
@@ -368,7 +368,7 @@ elif section == "Economic Drivers":
         title=f"{selected} vs USD/PHP"
     )
 
-    st.plotly_chart(scatter_fig, use_container_width=True)
+    st.plotly_chart(scatter_fig, width="stretch")
 
     # =====================================================
     # CORRELATION
@@ -436,7 +436,7 @@ elif section == "Correlation Analysis":
         title="Correlation Heatmap"
     )
 
-    st.plotly_chart(heatmap, use_container_width=True)
+    st.plotly_chart(heatmap, width="stretch")
 
     st.subheader("Strongest Correlations with USD/PHP")
 
@@ -450,7 +450,7 @@ elif section == "Correlation Analysis":
 
     target_corr["Strength"] = (target_corr["Correlation"].apply(corr_strength))
 
-    st.dataframe(target_corr, use_container_width=True)
+    st.dataframe(target_corr, width="stretch")
 
 # =====================================================
 # PREDICTIVE MODELING
@@ -647,7 +647,7 @@ elif section == "Predictive Modeling":
 
     st.plotly_chart(
         importance_fig,
-        use_container_width=True
+        width="stretch"
     )
 
     st.subheader("Macroeconomic Variable Importance")
@@ -657,7 +657,7 @@ elif section == "Predictive Modeling":
             "Importance",
             ascending=False
         ),
-        use_container_width=True
+        width="stretch"
     )
 
     st.markdown("""
@@ -700,7 +700,7 @@ elif section == "Predictive Modeling":
 
     st.plotly_chart(
         train_fig,
-        use_container_width=True
+        width="stretch"
     )
 
     st.markdown("""
@@ -746,7 +746,7 @@ elif section == "Predictive Modeling":
 
     st.plotly_chart(
         test_fig,
-        use_container_width=True
+        width="stretch"
     )
 
     st.markdown("""
