@@ -181,61 +181,172 @@ if section == "Overview":
     st.subheader("Summary Statistics")
     st.dataframe(df.describe())
 
-    # =========================================================
-    # MAIN FOREX GRAPH
-    # =========================================================
+# =========================================================
+# MAIN FOREX GRAPH
+# =========================================================
 
-    fig = px.line(
-        df,
-        x="Date",
-        y="USD_to_PHP",
-        title="PHP/USD Exchange Rate (2000 - Present)"
-    )
+fig = px.line(
+    df,
+    x="Date",
+    y="USD_to_PHP",
+    title="PHP/USD Exchange Rate (2000 - Present)"
+)
 
-    # 2008 Global Financial Crisis
-    fig.add_vrect(
-        x0="2008-09-01",
-        x1="2009-06-01",
-        fillcolor="red",
-        opacity=0.15,
-        line_width=0,
-        annotation_text="2008 Global Financial Crisis",
-        annotation_position="top left"
-    )
+# -----------------------------
+# HISTORICAL HIGHLIGHTS
+# -----------------------------
 
-    # COVID-19 Pandemic
-    fig.add_vrect(
-        x0="2020-03-01",
-        x1="2021-12-31",
-        fillcolor="orange",
-        opacity=0.15,
-        line_width=0,
-        annotation_text="COVID-19 Pandemic",
-        annotation_position="top left"
-    )
+# EDSA II / Political Crisis
+fig.add_vrect(
+    x0="2001-01-18",
+    x1="2001-01-20",
+    fillcolor="purple",
+    opacity=0.18,
+    line_width=0,
+    annotation_text="EDSA II",
+    annotation_position="top left"
+)
 
-    st.plotly_chart(fig, width="stretch")
+# Fiscal Crisis Escalation
+fig.add_vrect(
+    x0="2002-07-01",
+    x1="2004-05-10",
+    fillcolor="darkred",
+    opacity=0.12,
+    line_width=0,
+    annotation_text="Fiscal Crisis",
+    annotation_position="top left"
+)
 
-    st.markdown("""
-        This graph shows the movement of the Philippine Peso
-        against the US Dollar.
+# Fiscal Stabilization
+fig.add_vrect(
+    x0="2004-05-10",
+    x1="2005-11-01",
+    fillcolor="green",
+    opacity=0.12,
+    line_width=0,
+    annotation_text="Fiscal Stabilization",
+    annotation_position="top left"
+)
 
-        If the graph shows upward movement, that means peso 
-        is getting weaker, while downward movement 
-        signifies that the peso is getting stronger.
-        
-        The highlighted regions indicate major global economic disruptions
-        that significantly affected foreign exchange markets.
-        
-        - **2008 Global Financial Crisis**
-          triggered global financial instability,
-          capital outflows, and increased exchange rate volatility.
-        
-        - **COVID-19 Pandemic (2020–2021)**
-          caused major disruptions in trade, inflation,
-          monetary policy, and investor sentiment,
-          heavily influencing PHP/USD exchange rate behavior.
-        """)
+# E-VAT + OFW/BPO Boom
+fig.add_vrect(
+    x0="2005-11-02",
+    x1="2008-02-18",
+    fillcolor="limegreen",
+    opacity=0.10,
+    line_width=0,
+    annotation_text="E-VAT + OFW/BPO Boom",
+    annotation_position="top left"
+)
+
+# 2008 Global Financial Crisis
+fig.add_vrect(
+    x0="2008-09-01",
+    x1="2009-06-01",
+    fillcolor="red",
+    opacity=0.15,
+    line_width=0,
+    annotation_text="2008 Global Financial Crisis",
+    annotation_position="top left"
+)
+
+# Taper Tantrum
+fig.add_vrect(
+    x0="2013-05-22",
+    x1="2013-09-30",
+    fillcolor="gold",
+    opacity=0.15,
+    line_width=0,
+    annotation_text="Taper Tantrum",
+    annotation_position="top left"
+)
+
+# Fed Hikes + Inflation
+fig.add_vrect(
+    x0="2015-12-16",
+    x1="2018-09-25",
+    fillcolor="brown",
+    opacity=0.12,
+    line_width=0,
+    annotation_text="Fed Hikes + Inflation",
+    annotation_position="top left"
+)
+
+# COVID-19 Pandemic
+fig.add_vrect(
+    x0="2020-03-01",
+    x1="2021-12-31",
+    fillcolor="orange",
+    opacity=0.15,
+    line_width=0,
+    annotation_text="COVID-19 Pandemic",
+    annotation_position="top left"
+)
+
+# Ukraine War + Fed Tightening
+fig.add_vrect(
+    x0="2022-02-01",
+    x1="2022-09-28",
+    fillcolor="black",
+    opacity=0.10,
+    line_width=0,
+    annotation_text="Ukraine War Shock",
+    annotation_position="top left"
+)
+
+# Middle East Oil Shock
+fig.add_vrect(
+    x0="2026-02-28",
+    x1=df["Date"].max(),
+    fillcolor="crimson",
+    opacity=0.15,
+    line_width=0,
+    annotation_text="Middle East Oil Shock",
+    annotation_position="top left"
+)
+
+st.plotly_chart(fig, width="stretch")
+
+st.markdown("""
+This graph shows the movement of the Philippine Peso against the US Dollar.
+
+- **Upward movement** → Peso weakens (more pesos needed to buy 1 USD)
+- **Downward movement** → Peso strengthens
+
+The highlighted regions mark major political and economic events that influenced exchange rate behavior.
+
+### **2001 — EDSA II / Political Crisis**
+Senate suppression of impeachment evidence triggered protests and uncertainty.  
+The peso spiked sharply to **₱54/USD intraday** before recovering after Estrada’s ouster.
+
+### **2002–2004 — Fiscal Crisis Escalation**
+Budget deficits reached **5.3% of GDP**, sovereign downgrades followed, and investor confidence weakened.
+
+### **2004–2005 — Fiscal Stabilization**
+Arroyo’s re-election enabled fiscal reforms, including the **EVAT law**, helping restore confidence.
+
+### **2005–2008 — E-VAT + OFW/BPO Boom**
+Strong remittances, BPO expansion, and tax reform fueled sustained peso appreciation.
+
+### **2008–2009 — Global Financial Crisis**
+Global financial instability caused capital flight and exchange-rate volatility.
+
+### **2013 — Taper Tantrum**
+Fed tapering fears triggered capital outflows across emerging markets, weakening the peso.
+
+### **2015–2018 — Fed Hikes + Inflation**
+US monetary tightening, inflation, and trade deficits steadily weakened the peso.
+
+### **2020–2021 — COVID-19 Pandemic**
+Trade disruptions, inflation, and uncertainty reshaped foreign exchange markets globally.
+
+### **2022 — Ukraine War + Fed Tightening**
+Oil shocks and aggressive Fed hikes pushed the peso to **₱59.21/USD**, then a record low.
+
+### **2026 onward — Middle East Oil Shock**
+Energy supply risks and emergency declarations renewed depreciation pressure on the peso.
+""")
 
 # =========================================================
 # TREND ANALYSIS
