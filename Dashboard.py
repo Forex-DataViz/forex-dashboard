@@ -252,7 +252,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="GFC 2008"
+        annotation_text="GFC 2008",
         annotation_position="top left"
     )
     
