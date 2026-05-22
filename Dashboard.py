@@ -318,7 +318,7 @@ if section == "Overview":
 
     fig.update_annotations(
         textangle=-90,
-        font=dict(size=11),
+        font=dict(size=8),
         bgcolor="white",
         bordercolor="black",
         borderwidth=1
