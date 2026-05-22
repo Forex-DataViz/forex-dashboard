@@ -295,17 +295,16 @@ if section == "Overview":
         annotation_position="top left"
     )
     
-    # Middle East Oil Shock
-    if df["Date"].max() >= pd.Timestamp("2026-02-28"):
-        fig.add_vrect(
-            x0="2026-02-28",
-            x1=df["Date"].max(),
-            fillcolor="crimson",
-            opacity=0.15,
-            line_width=0,
-            annotation_text="Middle East Oil Shock",
-            annotation_position="top left"
-        )
+    # Middle East Oil Shock (As of 05-22, end at 05-21)
+    fig.add_vrect(
+        x0="2026-02-28",
+        x1="2026-05-21",
+        fillcolor="crimson",
+        opacity=0.15,
+        line_width=0,
+        annotation_text="Middle East Oil Shock",
+        annotation_position="top left"
+    )
 
     st.plotly_chart(fig, width="stretch")
     
