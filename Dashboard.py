@@ -201,8 +201,9 @@ if section == "Overview":
         x0="2001-01-18",
         x1="2001-01-20",
         fillcolor="purple",
-        opacity=0.18,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="EDSA II",
         annotation_position="top left"
     )
@@ -213,7 +214,8 @@ if section == "Overview":
         x1="2004-05-10",
         fillcolor="darkred",
         opacity=0.12,
-        line_width=0,
+        line_width=2,
+        line_color="black",
         annotation_text="Fiscal Crisis",
         annotation_position="top left"
     )
@@ -224,7 +226,8 @@ if section == "Overview":
         x1="2005-11-01",
         fillcolor="green",
         opacity=0.12,
-        line_width=0,
+        line_width=2,
+        line_color="black",
         annotation_text="Fiscal Stabilization",
         annotation_position="top left"
     )
@@ -234,8 +237,9 @@ if section == "Overview":
         x0="2005-11-02",
         x1="2008-02-18",
         fillcolor="limegreen",
-        opacity=0.10,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="E-VAT + OFW/BPO Boom",
         annotation_position="top left"
     )
@@ -245,8 +249,9 @@ if section == "Overview":
         x0="2008-09-01",
         x1="2009-06-01",
         fillcolor="red",
-        opacity=0.15,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="2008 Global Financial Crisis",
         annotation_position="top left"
     )
@@ -256,8 +261,9 @@ if section == "Overview":
         x0="2013-05-22",
         x1="2013-09-30",
         fillcolor="gold",
-        opacity=0.15,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="Taper Tantrum",
         annotation_position="top left"
     )
@@ -268,7 +274,8 @@ if section == "Overview":
         x1="2018-09-25",
         fillcolor="brown",
         opacity=0.12,
-        line_width=0,
+        line_width=2,
+        line_color="black",
         annotation_text="Fed Hikes + Inflation",
         annotation_position="top left"
     )
@@ -278,8 +285,9 @@ if section == "Overview":
         x0="2020-03-01",
         x1="2021-12-31",
         fillcolor="orange",
-        opacity=0.15,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="COVID-19 Pandemic",
         annotation_position="top left"
     )
@@ -289,8 +297,9 @@ if section == "Overview":
         x0="2022-02-01",
         x1="2022-09-28",
         fillcolor="black",
-        opacity=0.10,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="Ukraine War Shock",
         annotation_position="top left"
     )
@@ -300,10 +309,15 @@ if section == "Overview":
         x0="2026-02-28",
         x1="2026-05-21",
         fillcolor="crimson",
-        opacity=0.15,
-        line_width=0,
+        opacity=0.12,
+        line_width=2,
+        line_color="black",
         annotation_text="Middle East Oil Shock",
         annotation_position="top left"
+    )
+
+    fig.update_layout(
+        height=850
     )
 
     st.plotly_chart(fig, width="stretch")
