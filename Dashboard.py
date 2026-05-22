@@ -296,7 +296,7 @@ if section == "Overview":
     fig.add_vrect(
         x0="2022-02-01",
         x1="2022-09-28",
-        fillcolor="black",
+        fillcolor="blue",
         opacity=0.12,
         line_width=2,
         line_color="black",
@@ -316,8 +316,12 @@ if section == "Overview":
         annotation_position="top left"
     )
 
-    fig.update_layout(
-        height=850
+    fig.update_annotations(
+        textangle=-90,
+        font=dict(size=11),
+        bgcolor="white",
+        bordercolor="black",
+        borderwidth=1
     )
 
     st.plotly_chart(fig, width="stretch")
