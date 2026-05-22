@@ -228,7 +228,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="Fiscal Stabilization",
+        annotation_text="Fiscal Reform",
         annotation_position="top left"
     )
     
@@ -240,7 +240,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="E-VAT + OFW/BPO Boom",
+        annotation_text="EVAT Boom",
         annotation_position="top left"
     )
     
@@ -252,7 +252,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="2008 Global Financial Crisis",
+        annotation_text="GFC 2008"
         annotation_position="top left"
     )
     
@@ -264,7 +264,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="Taper Tantrum",
+        annotation_text="Taper",
         annotation_position="top left"
     )
     
@@ -276,7 +276,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="Fed Hikes + Inflation",
+        annotation_text="Fed Tightening",
         annotation_position="top left"
     )
     
@@ -288,7 +288,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="COVID-19 Pandemic",
+        annotation_text="COVID",
         annotation_position="top left"
     )
     
@@ -300,7 +300,7 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="Ukraine War Shock",
+        annotation_text="War Shock",
         annotation_position="top left"
     )
     
@@ -312,13 +312,12 @@ if section == "Overview":
         opacity=0.12,
         line_width=2,
         line_color="black",
-        annotation_text="Middle East Oil Shock",
+        annotation_text="Oil Shock",
         annotation_position="top left"
     )
 
     fig.update_annotations(
-        textangle=-90,
-        font=dict(size=8),
+        font=dict(size=9),
         bgcolor="white",
         bordercolor="black",
         borderwidth=1
@@ -334,35 +333,35 @@ if section == "Overview":
     
     The highlighted regions mark major political and economic events that influenced exchange rate behavior.
     
-    ### **2001 — EDSA II / Political Crisis**
+    ### **2001 — EDSA II / Political Crisis (Purple)**
     Senate suppression of impeachment evidence triggered protests and uncertainty.  
     The peso spiked sharply to **₱54/USD intraday** before recovering after Estrada’s ouster.
     
-    ### **2002–2004 — Fiscal Crisis Escalation**
+    ### **2002–2004 — Fiscal Crisis Escalation (Dark Red)**
     Budget deficits reached **5.3% of GDP**, sovereign downgrades followed, and investor confidence weakened.
     
-    ### **2004–2005 — Fiscal Stabilization**
+    ### **2004–2005 — Fiscal Stabilization (Green)**
     Arroyo’s re-election enabled fiscal reforms, including the **EVAT law**, helping restore confidence.
     
-    ### **2005–2008 — E-VAT + OFW/BPO Boom**
+    ### **2005–2008 — E-VAT + OFW/BPO Boom (Lime Green)**
     Strong remittances, BPO expansion, and tax reform fueled sustained peso appreciation.
     
-    ### **2008–2009 — Global Financial Crisis**
+    ### **2008–2009 — Global Financial Crisis (Red)**
     Global financial instability caused capital flight and exchange-rate volatility.
     
-    ### **2013 — Taper Tantrum**
+    ### **2013 — Taper Tantrum (Gold)**
     Fed tapering fears triggered capital outflows across emerging markets, weakening the peso.
     
-    ### **2015–2018 — Fed Hikes + Inflation**
+    ### **2015–2018 — Fed Hikes + Inflation (Brown)**
     US monetary tightening, inflation, and trade deficits steadily weakened the peso.
     
-    ### **2020–2021 — COVID-19 Pandemic**
+    ### **2020–2021 — COVID-19 Pandemic (Orange)**
     Trade disruptions, inflation, and uncertainty reshaped foreign exchange markets globally.
     
-    ### **2022 — Ukraine War + Fed Tightening**
+    ### **2022 — Ukraine War + Fed Tightening (Blue)**
     Oil shocks and aggressive Fed hikes pushed the peso to **₱59.21/USD**, then a record low.
     
-    ### **2026 onward — Middle East Oil Shock**
+    ### **2026 onward — Middle East Oil Shock (Crimson)**
     Energy supply risks and emergency declarations renewed depreciation pressure on the peso.
     """)
 
