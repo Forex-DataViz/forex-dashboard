@@ -12,13 +12,14 @@ start_time = time.perf_counter()
 # ─────────────────────────────────────────
 # API KEYS
 # ─────────────────────────────────────────
-EIA_KEY = os.environ.get("EIA_API_KEY") or "***REMOVED***"
-FRED_KEY = os.environ.get("FRED_API_KEY") or "***REMOVED***"
+EIA_KEY = os.environ.get("EIA_API_KEY")
+FRED_KEY = os.environ.get("FRED_API_KEY")
 
 if not EIA_KEY:
-    raise Exception("Missing EIA_API_KEY environment variable.")
+    raise RuntimeError("Missing EIA_API_KEY environment variable.")
+
 if not FRED_KEY:
-    raise Exception("Missing FRED_API_KEY environment variable.")
+    raise RuntimeError("Missing FRED_API_KEY environment variable.")
 
 # ─────────────────────────────────────────
 # GET LATEST FOREX DATE
