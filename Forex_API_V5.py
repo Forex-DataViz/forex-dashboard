@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import date, timedelta
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from sheets_upload import update_sheet
 
 start_time = time.perf_counter()
 
@@ -347,44 +348,7 @@ else:
 client = gspread.authorize(creds)
 spreadsheet = client.open("PH Forex Dashboard")
 
-def update_sheet(title, dataframe):
-    try:
-        sheet = spreadsheet.worksheet(title)
-    except gspread.WorksheetNotFound:
-        sheet = spreadsheet.add_worksheet(
-            title=title, rows="100000", cols="30"
-        )
-
-    existing_data = sheet.get_all_values()
-    existing_headers = existing_data[0] if existing_data else []
-    existing_dates = [row[0] for row in existing_data[1:] if row and row[0]]
-
-    current_headers = dataframe.columns.tolist()
-    schema_changed = existing_headers != current_headers
-
-    print(f"[DEBUG] Sheet: {title}")
-    print(f"[DEBUG] Schema changed: {schema_changed}")
-    print(f"[DEBUG] Existing headers: {existing_headers}")
-    print(f"[DEBUG] Current headers: {current_headers}")
-
-    if not existing_dates or schema_changed:
-        sheet.clear()
-        sheet.append_row(current_headers)
-        sheet.append_rows(dataframe.values.tolist())
-        print(f"[DEBUG] Full load done for {title}.")
-
-    elif latest not in existing_dates:
-        new_rows = dataframe[dataframe["Date"] == latest]
-        print(f"[DEBUG] Rows matched for latest date: {len(new_rows)}")
-        if not new_rows.empty:
-            sheet.append_rows(new_rows.values.tolist())
-            print(f"Appended {latest} to {title}.")
-        else:
-            print(f"[DEBUG] No row found for latest date: {latest}")
-    else:
-        print(f"[DEBUG] {latest} already exists in {title}. Skipping.")
-        
-update_sheet("FX_WIDE", df_wide)
+update_sheet("FX_WIDE", df_wide, spreadsheet=spreadsheet, latest=latest)
 
 # ─────────────────────────────────────────
 # LOGGING
