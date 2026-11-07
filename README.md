@@ -20,7 +20,7 @@ Follow these steps to deploy the automated pipeline using GitHub Actions.
 ### 1. Prepare the Repository
 1. Log into GitHub and create a new **Public** repository named `forex-dashboard`. Do not initialize it with a README.
 2. In your new repository, click **Add file** > **Upload files**.
-3. Upload `Forex_API_V5.py` and `MonetaryPolicyDecisions.xlsx` to the root directory and commit the changes.
+3. Upload `Forex_API_V5.py`, `sheets_upload.py`, and `MonetaryPolicyDecisions.xlsx` to the root directory and commit the changes.
 
 ### 2. Configure Secrets
 1. Navigate to the **Settings** tab of your repository.
@@ -128,3 +128,34 @@ The pipeline aggregates data from five sources:
 | [BSP Website](https://www.bsp.gov.ph/Statistics/sdds/table12_data.aspx) | Philippines Gross International Reserves (in million USD) | Monthly |
 
 All monthly and annual series are forward-filled onto the daily forex spine. An additional forward-fill and back-fill pass is applied at the end to handle weekends and data publication lags.
+
+## Google Sheets upload validation
+
+CSV export accepts missing values and infinities, but Requests rejects `NaN`,
+`Infinity`, and `-Infinity` when encoding a Google Sheets request. Forward/back
+filling cannot fix an entirely missing column and does not remove infinities.
+
+`sheets_upload.py` converts cells only at the upload boundary, in both full-load
+and incremental paths. Missing values (`None`, `NaN`, `pd.NA`, `NaT`) and positive
+or negative infinity become `""`, the Sheets API's explicit blank-cell value.
+Finite NumPy numbers and booleans become native Python values; dates and durations
+become ISO strings. Existing strings, column order, row order, and the source
+DataFrame/CSV are preserved. Unsupported objects fail with a row and column
+location before the existing worksheet is cleared.
+
+Warnings identify each affected column, original missing/nonfinite value, count,
+and first row position within the selected upload payload. An incremental upload
+still selects only `Date == latest`; an existing latest date is skipped, and a
+schema change still triggers a full reload.
+
+Run the offline regression tests (no API keys or Google credentials required):
+
+```sh
+python -m pip install pandas numpy requests gspread
+python -m unittest discover -s tests -v
+```
+
+The tests support the pipeline's Python 3.11 environment. They reproduce the
+original Requests exception, validate JSON serialization, and exercise full
+loads, changed schemas, empty/missing sheets, latest-date appends, and repeat-run
+skipping with a recording worksheet; they never send an upload.
