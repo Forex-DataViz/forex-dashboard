@@ -3,7 +3,7 @@ import json
 import time
 import requests
 import pandas as pd
-from datetime import date, timedelta
+from forex_dates import get_latest_date
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from sheets_upload import update_sheet
@@ -25,15 +25,6 @@ if not FRED_KEY:
 # ─────────────────────────────────────────
 # GET LATEST FOREX DATE
 # ─────────────────────────────────────────
-def get_latest_date():
-    for i in range(5):
-        check_date = (date.today() - timedelta(days=i)).strftime("%Y-%m-%d")
-        url = f"https://api.frankfurter.app/{check_date}?from=USD&to=PHP"
-        response = requests.get(url).json()
-        if "rates" in response:
-            return check_date
-    return None
-
 latest = get_latest_date()
 
 if latest is None:
