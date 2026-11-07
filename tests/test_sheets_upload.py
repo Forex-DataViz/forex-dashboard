@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta, timezone
 import io
 import json
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import gspread
 import numpy as np
@@ -11,6 +11,7 @@ import pandas as pd
 import requests
 
 from sheets_upload import dataframe_to_rows, to_sheet_cell, update_sheet
+from forex_dates import get_latest_date
 
 
 HEADERS = [
@@ -219,6 +220,26 @@ class UpdateSheetTests(unittest.TestCase):
         with redirect_stdout(self.output):
             update_sheet("FX_WIDE", self.frame, spreadsheet=self.book, latest=LATEST)
         self.assertEqual(sheet.calls, [])
+
+    @patch("forex_dates.requests.get")
+    def test_saturday_published_date_appends_friday_once(self, get):
+        get.return_value.json.return_value = {
+            "date": LATEST, "rates": {"PHP": 63.017},
+        }
+        latest = get_latest_date(date(2026, 11, 7))
+        sheet = RecordingWorksheet([HEADERS, ["2026-11-05"]])
+        self.book.worksheet.return_value = sheet
+        with redirect_stdout(self.output), self.assertLogs("sheets_upload", level="WARNING"):
+            update_sheet("FX_WIDE", self.frame, spreadsheet=self.book, latest=latest)
+        self.assertEqual(len(sheet.calls), 1)
+        self.assertEqual(sheet.calls[0][0], "append_rows")
+        self.assertEqual(len(sheet.calls[0][1]), 1)
+        self.assertEqual(sheet.calls[0][1][0][0], "2026-11-06")
+        self.assertEqual(sheet.calls[0][1][0][-1], "")
+        with redirect_stdout(self.output):
+            update_sheet("FX_WIDE", self.frame, spreadsheet=self.book, latest=latest)
+        self.assertEqual(len(sheet.calls), 1)
+        pd.testing.assert_frame_equal(self.frame, self.original)
 
     def test_no_matching_latest_row_does_not_write(self):
         sheet = RecordingWorksheet([HEADERS, ["2026-11-04"], [], [""]])

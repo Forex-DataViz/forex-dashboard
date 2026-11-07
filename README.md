@@ -20,7 +20,7 @@ Follow these steps to deploy the automated pipeline using GitHub Actions.
 ### 1. Prepare the Repository
 1. Log into GitHub and create a new **Public** repository named `forex-dashboard`. Do not initialize it with a README.
 2. In your new repository, click **Add file** > **Upload files**.
-3. Upload `Forex_API_V5.py`, `sheets_upload.py`, and `MonetaryPolicyDecisions.xlsx` to the root directory and commit the changes.
+3. Upload `Forex_API_V5.py`, `forex_dates.py`, `sheets_upload.py`, and `MonetaryPolicyDecisions.xlsx` to the root directory and commit the changes.
 
 ### 2. Configure Secrets
 1. Navigate to the **Settings** tab of your repository.
@@ -147,6 +147,13 @@ Warnings identify each affected column, original missing/nonfinite value, count,
 and first row position within the selected upload payload. An incremental upload
 still selects only `Date == latest`; an existing latest date is skipped, and a
 schema change still triggers a full reload.
+
+`forex_dates.py` uses the date published in Frankfurter's response. Weekend,
+holiday, or early-day requests can return the previous trading day's rates;
+the requested calendar date must not be used to select a row in that case.
+For example, a November 7 request returning November 6 data appends the November 6
+row if absent and skips it if already present. The five-request fallback and
+latest-date-only upload rule are unchanged.
 
 Run the offline regression tests (no API keys or Google credentials required):
 
